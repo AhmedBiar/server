@@ -11,13 +11,24 @@ app.use(cors());
 app.use(express.json());
 
 
+app.options("*", (req, res) => {
+  res.header("Access-Control-Allow-Origin", "*");
+  res.header(
+    "Access-Control-Allow-Methods",
+    "GET,POST,PUT,PATCH,DELETE,OPTIONS"
+  );
+  res.header("Access-Control-Allow-Headers", "Content-Type");
+  res.sendStatus(204);
+});
+
+
 const dbPath = path.join(process.cwd(), "db.json");
+
 
 function readDB() {
   const data = fs.readFileSync(dbPath, "utf8");
   return JSON.parse(data);
 }
-
 
 function writeDB(data) {
   fs.writeFileSync(dbPath, JSON.stringify(data, null, 2));
@@ -29,7 +40,6 @@ app.get("/ubicaciones", (req, res) => {
   res.json(db.ubicaciones);
 });
 
-
 app.get("/estadisticas/:id", (req, res) => {
   const db = readDB();
   const stat = db.estadisticas.find(s => s.id === parseInt(req.params.id));
@@ -39,7 +49,9 @@ app.get("/estadisticas/:id", (req, res) => {
 
 app.patch("/estadisticas/:id", (req, res) => {
   const db = readDB();
-  const index = db.estadisticas.findIndex(s => s.id === parseInt(req.params.id));
+  const index = db.estadisticas.findIndex(
+    s => s.id === parseInt(req.params.id)
+  );
   if (index === -1) return res.status(404).json({ error: "No encontrado" });
 
   db.estadisticas[index] = { ...db.estadisticas[index], ...req.body };
@@ -51,6 +63,7 @@ app.patch("/estadisticas/:id", (req, res) => {
 app.listen(PORT, () => {
   console.log(`Servidor Express corriendo en puerto ${PORT}`);
 });
+
 
 
 
