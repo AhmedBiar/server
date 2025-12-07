@@ -1,30 +1,24 @@
+import jsonServer from "json-server";
+import cors from "cors";
 
-const jsonServer = require("json-server");
 const server = jsonServer.create();
 const router = jsonServer.router("db.json");
-const middlewares = jsonServer.defaults();
-
-server.use(middlewares);
-
 
 server.use((req, res, next) => {
-  res.header("Access-Control-Allow-Origin", "*"); 
-  res.header("Access-Control-Allow-Methods", "GET, POST, PUT, PATCH, DELETE, OPTIONS");
+  res.header("Access-Control-Allow-Origin", "*");
+  res.header("Access-Control-Allow-Methods", "GET,POST,PUT,PATCH,DELETE,OPTIONS");
   res.header("Access-Control-Allow-Headers", "Content-Type, Authorization, X-Requested-With");
+  res.header("Access-Control-Allow-Credentials", "true");
+
   if (req.method === "OPTIONS") {
-    return res.sendStatus(200); 
+    return res.sendStatus(204);
   }
+
   next();
 });
 
-
-const path = require("path");
-server.use('/imagenes', require('express').static(path.join(__dirname, 'imagenes')));
-
+server.use(jsonServer.bodyParser);
 server.use(router);
 
-const port = process.env.PORT || 3000;
-server.listen(port, "0.0.0.0", () => {
-  console.log("JSON Server is running on port", port);
-});
+server.listen(3000, () => console.log("JSON server corriendo en puerto 3000"));
 
