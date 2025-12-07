@@ -7,19 +7,11 @@ const app = express();
 const PORT = process.env.PORT || 3000;
 
 
-app.use(cors());
+app.use(cors()); 
 app.use(express.json());
 
 
-app.options("*", (req, res) => {
-  res.header("Access-Control-Allow-Origin", "*");
-  res.header(
-    "Access-Control-Allow-Methods",
-    "GET,POST,PUT,PATCH,DELETE,OPTIONS"
-  );
-  res.header("Access-Control-Allow-Headers", "Content-Type");
-  res.sendStatus(204);
-});
+app.use(express.static(path.join(process.cwd(), "public")));
 
 
 const dbPath = path.join(process.cwd(), "db.json");
@@ -37,22 +29,21 @@ function writeDB(data) {
 
 app.get("/ubicaciones", (req, res) => {
   const db = readDB();
-  res.json(db.ubicaciones);
+  res.json(db.ubicaciones || []);
 });
 
 app.get("/estadisticas/:id", (req, res) => {
   const db = readDB();
-  const stat = db.estadisticas.find(s => s.id === parseInt(req.params.id));
+  const stat = db.estadisticas?.find(s => s.id === parseInt(req.params.id));
   if (!stat) return res.status(404).json({ error: "No encontrado" });
   res.json(stat);
 });
 
 app.patch("/estadisticas/:id", (req, res) => {
   const db = readDB();
-  const index = db.estadisticas.findIndex(
-    s => s.id === parseInt(req.params.id)
-  );
-  if (index === -1) return res.status(404).json({ error: "No encontrado" });
+  const index = db.estadisticas?.findIndex(s => s.id === parseInt(req.params.id));
+  if (index === undefined || index === -1)
+    return res.status(404).json({ error: "No encontrado" });
 
   db.estadisticas[index] = { ...db.estadisticas[index], ...req.body };
   writeDB(db);
@@ -60,9 +51,15 @@ app.patch("/estadisticas/:id", (req, res) => {
 });
 
 
+app.get("/", (req, res) => {
+  res.send("Servidor Express activo. Endpoints: /ubicaciones, /estadisticas/:id");
+});
+
+
 app.listen(PORT, () => {
   console.log(`Servidor Express corriendo en puerto ${PORT}`);
 });
+
 
 
 
