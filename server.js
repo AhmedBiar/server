@@ -4,6 +4,9 @@ import fs from "fs";
 
 import fetch from "node-fetch"; 
 
+const app = express();
+app.use(express.json());
+
 app.get("/img/:id", async (req, res) => {
   const db = loadDB();
   const item = db.ubicaciones.find(u => u.id === req.params.id);
@@ -18,9 +21,6 @@ app.get("/img/:id", async (req, res) => {
     res.status(500).send("Error cargando imagen");
   }
 });
-
-const app = express();
-app.use(express.json());
 
 const DB_PATH = "./db.json";
 
