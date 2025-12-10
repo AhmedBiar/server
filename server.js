@@ -2,25 +2,11 @@ import express from "express";
 import cors from "cors";
 import fs from "fs";
 
-import fetch from "node-fetch"; 
 
 const app = express();
 app.use(express.json());
 
-app.get("/img/:id", async (req, res) => {
-  const db = loadDB();
-  const item = db.ubicaciones.find(u => u.id === req.params.id);
-  if (!item) return res.status(404).send("No encontrada");
 
-  try {
-    const respuesta = await fetch(item.url);
-    const buffer = await respuesta.arrayBuffer();
-    res.set("Content-Type", respuesta.headers.get("content-type"));
-    res.send(Buffer.from(buffer));
-  } catch (err) {
-    res.status(500).send("Error cargando imagen");
-  }
-});
 
 const DB_PATH = "./db.json";
 
